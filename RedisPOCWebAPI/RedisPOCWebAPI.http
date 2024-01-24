@@ -1,0 +1,6 @@
+@RedisPOCWebAPI_HostAddress = http://localhost:5108
+
+GET {{RedisPOCWebAPI_HostAddress}}/RedisSample/
+Accept: application/json
+
+###
