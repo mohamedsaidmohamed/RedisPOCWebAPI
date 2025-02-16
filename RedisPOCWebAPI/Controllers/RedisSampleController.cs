@@ -18,9 +18,9 @@ namespace RedisPOCWebAPI.Controllers
         public async Task<ActionResult> Get()
         {
             //Set
-           await provider. SetAsync("demo", "123", TimeSpan.FromMinutes(1));
+           //await provider. SetAsync("xx", "123", TimeSpan.FromMinutes(5));
 
-            var xx= await provider.GetAsync<string>("demo");
+            var xx= await provider.GetAsync<string>("xx");
             //if (_distributedCache.TryGetValue(servicesListCacheKey, out List<SafeerServices> services))
             //{
             //    //Employee list found in cache
@@ -43,7 +43,7 @@ namespace RedisPOCWebAPI.Controllers
             //    }
             //}
 
-            return Ok();
+            return Ok(xx);
         }
 
 

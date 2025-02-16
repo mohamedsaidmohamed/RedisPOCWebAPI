@@ -31,15 +31,24 @@ builder.Services.AddEasyCaching(options =>
     
    options.WithJson("myredis");
     // local
-    options.UseInMemory("m1");
+    options.UseInMemory(config => { 
+    //config.DBConfig.ExpirationScanFrequency = 60;
 
+    },"m1");
+
+    
     options.UseRedis(config =>
     {
-        config.DBConfig.Endpoints.Add(new EasyCaching.Core.Configurations.ServerEndPoint("redis-k8s-stg.moe.gov.sa", 6379));
-        config.DBConfig.Password = "safrstg@2024@";
-        config.DBConfig.Username = "safeer";
+        config.DBConfig.Endpoints.Add(new EasyCaching.Core.Configurations.ServerEndPoint("127.0.0.1", 6379));
+        // config.DBConfig.Endpoints.Add(new EasyCaching.Core.Configurations.ServerEndPoint("redis-k8s-stg.moe.gov.sa", 6379));
+        //config.DBConfig.Password = "safrstg@2024@";
+        //config.DBConfig.Username = "safeer";
+        config.DBConfig.Password = ""; // If no password is set
+        config.DBConfig.IsSsl = false; // Disable SSL
         config.DBConfig.AbortOnConnectFail = false;
         config.DBConfig.ConnectionTimeout = 10000;
+        config.DBConfig.AsyncTimeout = 60000; // Increase timeout to 60 seconds
+        config.DBConfig.SyncTimeout = 60000;  // Increase sync timeout
 
     }, "myredis");
     // combine local and distributed
@@ -47,17 +56,19 @@ builder.Services.AddEasyCaching(options =>
     {
         config.TopicName = "test-topic";
         config.EnableLogging = false;
-
+        
         // specify the local cache provider name after v0.5.4
         config.LocalCacheProviderName = "m1";
         // specify the distributed cache provider name after v0.5.4
         config.DistributedCacheProviderName = "myredis";
-    },"SafeerAll")
+     
+    }, "SafeerAll")
     // use redis bus
     .WithRedisBus(busConf =>
     {
-        busConf.Endpoints.Add(new ServerEndPoint("redis-k8s-stg.moe.gov.sa", 6380));
+        busConf.Endpoints.Add(new ServerEndPoint("127.0.0.1", 6379));
         busConf.SerializerName = "myredis";
+       
 
     });
 
