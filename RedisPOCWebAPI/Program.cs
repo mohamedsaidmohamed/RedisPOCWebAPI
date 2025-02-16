@@ -52,7 +52,7 @@ builder.Services.AddEasyCaching(options =>
         config.LocalCacheProviderName = "m1";
         // specify the distributed cache provider name after v0.5.4
         config.DistributedCacheProviderName = "myredis";
-    })
+    },"SafeerAll")
     // use redis bus
     .WithRedisBus(busConf =>
     {

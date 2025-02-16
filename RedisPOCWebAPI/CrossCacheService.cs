@@ -16,35 +16,68 @@ namespace RedisPOCWebAPI
         #region Constructor
         public CrossCacheService( IConfiguration configuration, IHybridProviderFactory hybridFactory)
         {
-           // _hybrid = hybridFactory.GetHybridCachingProvider(CacheStore.All.ToString());
+           _hybrid = hybridFactory.GetHybridCachingProvider("SafeerAll");
             _configuration = configuration;
         }
         #endregion
-
         #region Methods
-        public Task<T?> GetCacheAsync<T>(string cacheKey, CancellationToken cancellationToken = default)
+        public async Task<T?> GetCacheAsync<T>(string cacheKey,
+                                             CancellationToken cancellationToken = default) where T : class
         {
-            throw new NotImplementedException();
+            T? value = null;
+            cacheKey = $"Safeer:{cacheKey}";
+            await Task.Run(() => value = _hybrid.GetAsync<T>(cacheKey, cancellationToken).Result.Value);
+
+            return value;
+        }
+        public async Task SetCacheAsync<T>(string cacheKey,
+                                          T value,
+                                          CancellationToken cancellationToken = default) where T : class
+        {
+            cacheKey = $"Safeer:{cacheKey}";
+            await _hybrid.SetAsync(cacheKey, value, TimeSpan.FromMinutes(1), cancellationToken);
+
         }
 
-        public Task<T> GetOrCreateCacheAsync<T>(string cacheKey, Func<Task<T>> getResonse, CancellationToken cancellationToken = default)
+
+        public async Task<T> GetOrCreateCacheAsync<T>(string cacheKey,
+                                                      Func<Task<T>> getResonse,
+                                                      CancellationToken cancellationToken = default) where T : class, new()
         {
-            throw new NotImplementedException();
+            T? response = null;
+
+            //if (!_configuration.CrossCacheEntry_IsEnabled)
+            //{
+            //    return await getResonse() ?? new();
+            //}
+
+            response = await GetCacheAsync<T>(cacheKey, cancellationToken);
+
+            if (response is null)
+            {
+             //   _loggingService.Information($"Caching: {cacheKey} not found in cache. Fetching from database.");
+                response = await getResonse();
+
+                if (response != default)
+                {
+                    await SetCacheAsync(cacheKey, response, cancellationToken);
+                }
+            }
+            else
+            {
+              //  _loggingService.Information($"Caching: {cacheKey} found in cache.");
+            }
+
+            return response ?? new();
         }
 
-        public Task InvalidateCacheAsync(string keyPrefix)
+        public async Task RemoveAsync(string key, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            await _hybrid.RemoveByPrefixAsync($"{key}", cancellationToken);
         }
-
-        public Task RemoveAsync(string key, CancellationToken cancellationToken = default)
+        public async Task InvalidateCacheAsync(string keyPrefix)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task SetCacheAsync<T>(string cacheKey, T value, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
+            await _hybrid.RemoveByPrefixAsync($"Safeer:{keyPrefix}");
         }
         #endregion
 
