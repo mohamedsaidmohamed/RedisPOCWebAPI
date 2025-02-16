@@ -1,3 +1,4 @@
+using EasyCaching.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using StackExchange.Redis;
@@ -6,41 +7,43 @@ namespace RedisPOCWebAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class RedisSampleController(IDistributedCache distributedCache) : ControllerBase
+    public class RedisSampleController(IHybridCachingProvider provider) : ControllerBase
     {
-        private const string servicesListCacheKey = "servicesList";
+        //private const string servicesListCacheKey = "servicesList";
 
-        private readonly IDistributedCache _distributedCache = distributedCache;
         
-        private static readonly SemaphoreSlim semaphore = new(1, 1); 
+        //private static readonly SemaphoreSlim semaphore = new(1, 1); 
 
         [HttpGet]
         public async Task<ActionResult> Get()
         {
-            
-            if (_distributedCache.TryGetValue(servicesListCacheKey, out List<SafeerServices> services))
-            {
-                //Employee list found in cache
-            }
-            else
-            {  // Employee list not found in cache. Fetching from database.
-                try
-                {
-                    await semaphore.WaitAsync();
+            //Set
+           await provider. SetAsync("demo", "123", TimeSpan.FromMinutes(1));
 
-                    // Fetching Data from db 
-                    services = getServicesListFromDB();
+            var xx= await provider.GetAsync<string>("demo");
+            //if (_distributedCache.TryGetValue(servicesListCacheKey, out List<SafeerServices> services))
+            //{
+            //    //Employee list found in cache
+            //}
+            //else
+            //{  // Employee list not found in cache. Fetching from database.
+            //    try
+            //    {
+            //        await semaphore.WaitAsync();
 
-                    var cacheEntryOptions = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(60)).SetAbsoluteExpiration(TimeSpan.FromMinutes(120));
-                    await _distributedCache.SetAsync(servicesListCacheKey, services, cacheEntryOptions);
-                }
-                finally
-                {
-                    semaphore.Release();
-                }
-            }
+            //        // Fetching Data from db 
+            //        services = getServicesListFromDB();
 
-            return Ok(services);
+            //        var cacheEntryOptions = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(60)).SetAbsoluteExpiration(TimeSpan.FromMinutes(120));
+            //        await _distributedCache.SetAsync(servicesListCacheKey, services, cacheEntryOptions);
+            //    }
+            //    finally
+            //    {
+            //        semaphore.Release();
+            //    }
+            //}
+
+            return Ok();
         }
 
 
