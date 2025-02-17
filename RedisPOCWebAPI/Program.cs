@@ -39,12 +39,12 @@ builder.Services.AddEasyCaching(options =>
     
     options.UseRedis(config =>
     {
-        //config.DBConfig.Endpoints.Add(new EasyCaching.Core.Configurations.ServerEndPoint("127.0.0.1", 6379));
-         config.DBConfig.Endpoints.Add(new EasyCaching.Core.Configurations.ServerEndPoint("redis-k8s-stg.moe.gov.sa", 6379));
-        config.DBConfig.Password = "safrstg@2024@";
-        config.DBConfig.Username = "safeer";
-        //config.DBConfig.Password = ""; // If no password is set
-       // config.DBConfig.IsSsl = false; // Disable SSL
+        config.DBConfig.Endpoints.Add(new EasyCaching.Core.Configurations.ServerEndPoint("127.0.0.1", 6379));
+       //  config.DBConfig.Endpoints.Add(new EasyCaching.Core.Configurations.ServerEndPoint("redis-k8s-stg.moe.gov.sa", 6379));
+        //config.DBConfig.Password = "safrstg@2024@";
+        //config.DBConfig.Username = "safeer";
+        config.DBConfig.Password = ""; // If no password is set
+        config.DBConfig.IsSsl = false; // Disable SSL
         config.DBConfig.AbortOnConnectFail = false;
         config.DBConfig.ConnectionTimeout = 10000;
         config.DBConfig.AsyncTimeout = 60000; // Increase timeout to 60 seconds
@@ -66,7 +66,7 @@ builder.Services.AddEasyCaching(options =>
     // use redis bus
     .WithRedisBus(busConf =>
     {
-        busConf.Endpoints.Add(new ServerEndPoint("redis-k8s-stg.moe.gov.sa", 6379));
+        busConf.Endpoints.Add(new ServerEndPoint("127.0.0.1", 6379));
         busConf.SerializerName = "safeer-redis";
        
 

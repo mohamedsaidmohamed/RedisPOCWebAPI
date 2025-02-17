@@ -18,9 +18,11 @@ namespace RedisPOCWebAPI.Controllers
         public async Task<ActionResult> Get()
         {
             //Set
-           //await provider. SetAsync("xx", "123", TimeSpan.FromMinutes(5));
+          await provider. SetAsync("Safeer-CommanData:Attaches", "123", TimeSpan.FromMinutes(5));
 
             var xx= await provider.GetAsync<object>("Safeer-CommanData:Attaches");
+            //var xx= await provider.GetAsync<object>("Safeer-CommanData:Attaches");
+
             //if (_distributedCache.TryGetValue(servicesListCacheKey, out List<SafeerServices> services))
             //{
             //    //Employee list found in cache
